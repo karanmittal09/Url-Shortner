@@ -3,7 +3,7 @@ import express from 'express';
 import connectDB from './src/config/mongodb.js';
 import shortUrlRoutes from './src/routes/shorturl.routes.js'; // ✅ FIXED: name and usage
 import { redirectFromShortUrl } from './src/controller/shorturl.controller.js'; // ✅ FIXED: import redirect function
-
+import { errorHandler } from './src/utils/errorHandler.js'; // ✅ FIXED: import error handler
 dotenv.config();
 
 const app = express();
@@ -14,7 +14,9 @@ app.use(express.urlencoded({ extended: true }));
 // ✅ Mount the router correctly
 app.use("/api", shortUrlRoutes);
 
-app.get("/:id", redirectFromShortUrl); // ✅ FIXED: redirect route
+app.get("/:id", redirectFromShortUrl); 
+
+app.use(errorHandler)
 
 app.listen(5000, () => {
   connectDB();

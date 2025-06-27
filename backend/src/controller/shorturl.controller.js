@@ -1,16 +1,21 @@
 import { getShortUrl } from "../dao/shorturl.dao.js";
 import { createShortUrlwithoutUser } from "../services/shorturl.service.js";
+import wrapAsync from "../utils/truCatchWrapper.js";
 
+export const createShortUrl = wrapAsync(async (req, res) => {
+  const { url, slug } = req.body;
 
-export const createShortUrl = async(req , res) => {
-   const { url } = req.body;
-   const shortUrl = await createShortUrlwithoutUser(url);
-   res.send(process.env.APP_URL + shortUrl);
-}
+  // Support optional slug
+  const shortUrl = await createShortUrlwithoutUser(url, slug);
 
-export const redirectFromShortUrl = async (req, res) => {
+  res.status(200).json({ shortUrl: process.env.APP_URL + shortUrl });
+});
+
+export const redirectFromShortUrl = wrapAsync(async (req, res) => {
   const { id } = req.params;
-  const url = await getShortUrl(id);
-  res.redirect(url.fullurl);
-}
 
+  const url = await getShortUrl(id);
+  if (!url) throw new Error("Short URL not found");
+
+  res.redirect(url.fullurl);
+});
