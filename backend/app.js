@@ -2,9 +2,10 @@ import  dotenv from 'dotenv';
 import express from 'express'
 import { nanoid } from 'nanoid';
 import connectDB from './src/config/mongodb.js';
+import shortUrl from './src/models/shorturl.js';
 dotenv.config();
 
-import urlSchema from './src/models/shorturl.js';
+import urlSchema from './src/routes/shorturl.routes.js';
 
 const app = express();
 
@@ -12,18 +13,20 @@ const app = express();
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))
 
-app.post("/api/create", (req, res)=>{
-  const {url} = req.body
+app.use("/api/create", shortUrl)
 
-  const shortUrl = nanoid(7)
-  const newUrl = new urlSchema({
-    originalUrl: url,
-    shortUrl: shortUrl,
-  })
-  newUrl.save()
+
+// app.get("/:shortUrl", async (req, res)=>{
+//   const {shortUrl} = req.params;
+//   const url = await urlSchema.findOne({shortUrl: shortUrl});
   
-  res.send(nanoid(7));
-})
+//   if(url){
+//     res.redirect(url.fullurl);
+//   }
+//   else {
+//     res.status(404).send("URL not found");
+//   }
+// })
 
 app.listen(5000, ()=>{
   connectDB();
